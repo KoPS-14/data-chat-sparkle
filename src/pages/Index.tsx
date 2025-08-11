@@ -8,6 +8,9 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { DataPreview } from "@/components/data/DataPreview";
+import { BarChartPanel } from "@/components/charts/BarChartPanel";
+import { DownloadSummaryPDF } from "@/components/export/DownloadSummaryPDF";
+import { parseChartCommand } from "@/lib/chatCommands";
 
 interface ChatMessage {
   id: string;
@@ -153,6 +156,27 @@ const Index = () => {
           </Card>
         )
       }]));
+    } else if (lower.includes("visualize") || lower.includes("bar chart") || lower.includes("show top")) {
+      const cfg = parseChartCommand(text, rows);
+      if (cfg) {
+        setMessages((prev) => ([
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: (
+              <BarChartPanel
+                rows={rows}
+                category={cfg.category}
+                groupBy={cfg.groupBy}
+                topN={cfg.topN}
+              />
+            ),
+          },
+        ]));
+      } else {
+        setMessages((prev) => ([...prev, { id: crypto.randomUUID(), role: "assistant", content: "I couldn't find those columns. Try: visualize City with Payment Method bar chart or show top 10 for Product as bars." }]));
+      }
     } else {
       setMessages((prev) => ([...prev, { id: crypto.randomUUID(), role: "assistant", content: "Try: \"summary\", \"missing values\", or \"outliers in column X\"." }]));
     }
@@ -171,6 +195,7 @@ const Index = () => {
         <div className="hidden sm:flex gap-2">
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>Upload</Button>
           <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={(e) => handleUpload(e.target.files?.[0])} />
+          <DownloadSummaryPDF />
           <a href="#main" className="sr-only">Skip to content</a>
         </div>
       </header>
@@ -178,6 +203,11 @@ const Index = () => {
       <main id="main" className="container pb-28">
         <section className="flex flex-col items-center gap-6">
           <img src={heroImage} alt="Data analytics abstract illustration" className="w-full max-w-3xl rounded-xl shadow" loading="lazy" />
+          {rows.length > 0 && (
+            <section id="summary-section" className="w-full max-w-3xl">
+              <DataPreview rows={rows} />
+            </section>
+          )}
           <div className="w-full max-w-3xl space-y-3">
             {messages.map((m) => (
               <MessageBubble key={m.id} role={m.role}>{typeof m.content === "string" ? <span>{m.content}</span> : m.content}</MessageBubble>

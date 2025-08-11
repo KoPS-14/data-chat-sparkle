@@ -92,22 +92,73 @@ export function DataPreview({ rows }: DataPreviewProps) {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
-            {Object.entries(stats).map(([key, val]) => (
-              <div key={key} className="rounded-md border p-3">
-                <div className="font-medium mb-1">{key}</div>
-                {val.type === "number" ? (
-                  <div className="text-sm text-muted-foreground">
-                    Count: {val.count} · Missing: {val.missing} · Mean: {val.mean.toFixed(2)} · Median: {val.median} · Range: {val.min}–{val.max} · Outliers: {val.outliers}
-                  </div>
-                ) : val.type === "text" ? (
-                  <div className="text-sm text-muted-foreground">
-                    Count: {val.count} · Missing: {val.missing} · Unique: {val.unique}
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">Empty column (all missing)</div>
-                )}
-              </div>
-            ))}
+            {Object.entries(stats).map(([key, val]) => {
+              const values = rows
+                .map((r) => r[key])
+                .filter((v) => v !== null && v !== undefined && v !== "");
+
+              let topList: { label: string; count: number }[] = [];
+              let topNums: number[] = [];
+
+              if (val.type === "text") {
+                const counts = new Map<string, number>();
+                for (const v of values) {
+                  const s = String(v);
+                  counts.set(s, (counts.get(s) || 0) + 1);
+                }
+                topList = Array.from(counts.entries())
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 5)
+                  .map(([label, count]) => ({ label, count }));
+              } else if (val.type === "number") {
+                topNums = values
+                  .map((n) => Number(n))
+                  .filter((n) => !Number.isNaN(n))
+                  .sort((a, b) => b - a)
+                  .slice(0, 5);
+              }
+
+              return (
+                <div key={key} className="rounded-md border p-3">
+                  <div className="font-medium mb-1">{key}</div>
+                  {val.type === "number" ? (
+                    <>
+                      <div className="text-sm text-muted-foreground">
+                        Count: {val.count} · Missing: {val.missing} · Mean: {val.mean.toFixed(2)} · Median: {val.median} · Range: {val.min}–{val.max} · Outliers: {val.outliers}
+                      </div>
+                      {topNums.length ? (
+                        <ul className="mt-2 text-xs text-muted-foreground grid grid-cols-2 gap-1">
+                          {topNums.map((n, i) => (
+                            <li key={i} className="flex items-center justify-between">
+                              <span>Top {i + 1}</span>
+                              <span>{n}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </>
+                  ) : val.type === "text" ? (
+                    <>
+                      <div className="text-sm text-muted-foreground">
+                        Count: {val.count} · Missing: {val.missing} · Unique: {val.unique}
+                      </div>
+                      {topList.length ? (
+                        <ul className="mt-2 text-xs text-muted-foreground grid grid-cols-1 gap-1">
+                          {topList.map(({ label, count }) => (
+                            <li key={label} className="flex items-center justify-between">
+                              <span className="truncate max-w-[70%]" title={label}>{label}</span>
+                              <span>{count}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">Empty column (all missing)</div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
