@@ -31,6 +31,7 @@ const Index = () => {
   }]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [input, setInput] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
 
@@ -81,6 +82,7 @@ const Index = () => {
       if (!file) return;
       const data = await parseFile(file);
       setRows(data);
+      setUploadedFileName(file.name);
       toast({ title: "File processed", description: `${file.name} • ${data.length} rows` });
       setMessages((prev) => ([
         ...prev,
@@ -192,9 +194,14 @@ const Index = () => {
             <p className="text-xs text-muted-foreground">Upload CSV/Excel and chat with your data</p>
           </div>
         </div>
-        <div className="hidden sm:flex gap-2">
+        <div className="hidden sm:flex items-center gap-2">
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>Upload</Button>
           <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={(e) => handleUpload(e.target.files?.[0])} />
+          {uploadedFileName ? (
+            <span className="text-xs text-muted-foreground truncate max-w-[200px]" title={uploadedFileName}>
+              {uploadedFileName}
+            </span>
+          ) : null}
           <DownloadSummaryPDF />
           <a href="#main" className="sr-only">Skip to content</a>
         </div>
@@ -203,11 +210,6 @@ const Index = () => {
       <main id="main" className="container pb-28">
         <section className="flex flex-col items-center gap-6">
           <img src={heroImage} alt="Data analytics abstract illustration" className="w-full max-w-3xl rounded-xl shadow" loading="lazy" />
-          {rows.length > 0 && (
-            <section id="summary-section" className="w-full max-w-3xl">
-              <DataPreview rows={rows} />
-            </section>
-          )}
           <div className="w-full max-w-3xl space-y-3">
             {messages.map((m) => (
               <MessageBubble key={m.id} role={m.role}>{typeof m.content === "string" ? <span>{m.content}</span> : m.content}</MessageBubble>
@@ -231,6 +233,11 @@ const Index = () => {
                 <span>Attach</span>
               </Button>
             </label>
+            {uploadedFileName ? (
+              <span className="text-xs text-muted-foreground truncate max-w-[180px]" title={uploadedFileName}>
+                {uploadedFileName}
+              </span>
+            ) : null}
             <Button variant="hero" onClick={onSend}>Send</Button>
           </div>
         </div>

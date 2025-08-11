@@ -83,11 +83,11 @@ export function BarChartPanel({ rows, category, groupBy, topN = 10, title }: Bar
       <CardHeader>
         <CardTitle>{title || (groupBy ? `${category} by ${groupBy}` : `${category} frequency`)}</CardTitle>
       </CardHeader>
-      <CardContent style={{ height: 360 }}>
+      <CardContent style={{ height: 480 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 32 }}>
+          <BarChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 48 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={category} angle={-25} textAnchor="end" interval={0} height={60} />
+            <XAxis dataKey={category} angle={-25} textAnchor="end" interval={0} height={72} />
             <YAxis />
             <Tooltip />
             <Legend />

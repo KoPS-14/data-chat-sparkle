@@ -6,8 +6,11 @@ export interface DataPreviewProps {
 }
 
 function inferColumns(rows: Record<string, any>[]) {
-  const first = rows[0] ?? {};
-  return Object.keys(first);
+  const set = new Set<string>();
+  for (const r of rows) {
+    Object.keys(r || {}).forEach((k) => set.add(k));
+  }
+  return Array.from(set);
 }
 
 function isNumericColumn(rows: Record<string, any>[], key: string) {
@@ -52,8 +55,8 @@ function summarize(rows: Record<string, any>[]) {
 }
 
 export function DataPreview({ rows }: DataPreviewProps) {
-  const preview = rows.slice(0, 8);
-  const columns = inferColumns(preview);
+  const preview = rows;
+  const columns = inferColumns(rows);
   const stats = summarize(rows);
 
   return (

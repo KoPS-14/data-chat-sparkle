@@ -24,7 +24,7 @@ export function MessageBubble({ role, children }: MessageBubbleProps) {
           "rounded-lg p-4 shadow-sm",
           isSystem && "bg-muted text-muted-foreground",
           !isSystem && (isUser ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"),
-          "glass-panel"
+          !isUser && "glass-panel"
         )}
       >
         {children}
