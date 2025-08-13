@@ -15,7 +15,7 @@ export function MessageBubble({ role, children }: MessageBubbleProps) {
   return (
     <div
       className={cn(
-        "max-w-3xl w-full flex",
+  "w-full flex",
         isUser ? "justify-end" : "justify-start"
       )}
     >
@@ -24,7 +24,9 @@ export function MessageBubble({ role, children }: MessageBubbleProps) {
           "rounded-lg p-4 shadow-sm",
           isSystem && "bg-muted text-muted-foreground",
           !isSystem && (isUser ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"),
-          !isUser && "glass-panel"
+          !isUser && "glass-panel",
+          // Let assistant/system bubbles (which render charts) span full width; keep user text reasonably narrow
+          isUser ? "max-w-[75%]" : "w-full"
         )}
       >
         {children}

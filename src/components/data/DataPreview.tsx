@@ -61,12 +61,12 @@ export function DataPreview({ rows }: DataPreviewProps) {
 
   return (
     <div className="space-y-4">
-      <Card>
+  <Card id="data-preview-section">
         <CardHeader>
           <CardTitle>Data preview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto" style={{ maxHeight: 400, overflowY: 'auto' }}>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -89,9 +89,9 @@ export function DataPreview({ rows }: DataPreviewProps) {
         </CardContent>
       </Card>
 
-      <Card>
+  <Card id="summary-section">
         <CardHeader>
-          <CardTitle>Quick summary</CardTitle>
+          <CardTitle className="text-2xl text-neutral-900">Quick summary</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
@@ -122,15 +122,15 @@ export function DataPreview({ rows }: DataPreviewProps) {
               }
 
               return (
-                <div key={key} className="rounded-md border p-3">
-                  <div className="font-medium mb-1">{key}</div>
+                <div key={key} className="rounded-md border p-4 bg-white">
+                  <div className="font-semibold mb-1 text-base text-neutral-900">{key}</div>
                   {val.type === "number" ? (
                     <>
-                      <div className="text-sm text-muted-foreground">
-                        Count: {val.count} · Missing: {val.missing} · Mean: {val.mean.toFixed(2)} · Median: {val.median} · Range: {val.min}–{val.max} · Outliers: {val.outliers}
+                      <div className="text-base text-neutral-800">
+                        Count: {val.count} - Missing: {val.missing} - Mean: {val.mean.toFixed(2)} - Median: {val.median} - Range: {val.min}–{val.max} - Outliers: {val.outliers}
                       </div>
                       {topNums.length ? (
-                        <ul className="mt-2 text-xs text-muted-foreground grid grid-cols-2 gap-1">
+                        <ul className="mt-2 text-sm text-neutral-800 grid grid-cols-2 gap-1">
                           {topNums.map((n, i) => (
                             <li key={i} className="flex items-center justify-between">
                               <span>Top {i + 1}</span>
@@ -142,22 +142,22 @@ export function DataPreview({ rows }: DataPreviewProps) {
                     </>
                   ) : val.type === "text" ? (
                     <>
-                      <div className="text-sm text-muted-foreground">
-                        Count: {val.count} · Missing: {val.missing} · Unique: {val.unique}
+                      <div className="text-base text-neutral-800">
+                        Count: {val.count} - Missing: {val.missing} - Unique: {val.unique}
                       </div>
                       {topList.length ? (
-                        <ul className="mt-2 text-xs text-muted-foreground grid grid-cols-1 gap-1">
+                        <ul className="mt-2 text-sm text-neutral-800 grid grid-cols-1 gap-1">
                           {topList.map(({ label, count }) => (
                             <li key={label} className="flex items-center justify-between">
-                              <span className="truncate max-w-[70%]" title={label}>{label}</span>
-                              <span>{count}</span>
+                              <span className="break-words whitespace-normal pr-2" title={label}>{label}</span>
+                              <span className="shrink-0">{count}</span>
                             </li>
                           ))}
                         </ul>
                       ) : null}
                     </>
                   ) : (
-                    <div className="text-sm text-muted-foreground">Empty column (all missing)</div>
+                    <div className="text-base text-neutral-800">Empty column (all missing)</div>
                   )}
                 </div>
               );
